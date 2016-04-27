@@ -4,17 +4,27 @@
 			body{margin:0; padding:0}
             div{margin-left: 2em; margin-top: .5em; padding-top: .5em}
             .lessMargin{margin-top: -.5em}
-            p{font-family: Helvetica}
-            select{margin-top: -1em}
-            
-            bottom{position: relative; margin-bottom: 0}
+            h1{text-align: center}
+            p{text-align: center}
+            .inline{text-align: left; display: inline}
+            select{display: inline; margin-top: -.5em}
+            #bottom{position: absolute; bottom: 0px}
 		</style>
 	</head>
 	<body>
 		<canvas id="top"></canvas>
         <canvas id="bottom"></canvas>
+        <h1>Dischord</h1>
+        <p>The goal of Dischord is to generate near-completely random sequences of chords.</p>
+        <p>This is accomplished using two one-dimensional cellular automata.</p>
+        <p>The bottom automaton determines the timing and length of each chord.</p>
+        <p>The top automaton determines the frequencies of the notes that will be played in the chord, based on the provided scale.</p>
+        <p>Both automata generate patterns that cannot be reproduced without the seed and rules, except by NP processes.</p>
+        <p>Read more about the randomness at <a target="_blank" href="http://www.stephenwolfram.com/publications/cellular-automata-complexity/pdfs/random-sequence-generation-cellular-automata.pdf">http://www.stephenwolfram.com/publications/cellular-automata-complexity/pdfs/random-sequence-generation-cellular-automata.pdf</a>.</p>
+        <p>Created by Reuben Brenner-Adams using <a target="_blank" href="https://github.com/abbernie/tune">Tune.js</a> and <a target="_blank" href="https://github.com/Theodeus/tuna">Tuna.js</a>.</p>
+        <p>Copyright 2016.</p>
         <div>
-            <p>Scale:</p>
+            <p class="inline">Scale:</p>
             <select id="scaleSelect">
                 <option value="astro">Astro</option>
                 <option value="cluster6a">Cluster</option>
@@ -29,7 +39,7 @@
             </select>
         </div>
         <div class="lessMargin">
-            <p>Base frequency:</p>
+            <p class="inline">Base frequency:</p>
             <select id="frequencySelect">
                 <option value="110" selected>110</option>
                 <option value="150">150</option>
@@ -40,7 +50,7 @@
             </select>
         </div>
         <div class="lessMargin">
-            <p>Beat length:</p>
+            <p class="inline">Beat length:</p>
             <select id="beatLengthSelect">
                 <option value=".1">1/10</option>
                 <option value=".25" selected>1/4</option>
