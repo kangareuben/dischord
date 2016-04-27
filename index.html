@@ -1,14 +1,13 @@
 <html>
 	<head>
 		<style>
-			body{margin:0; padding:0}
-            div{margin-left: 2em; margin-top: .5em; padding-top: .5em}
-            .lessMargin{margin-top: -.5em}
+            body{font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif}
             h1{text-align: center}
             p{text-align: center}
-            .inline{text-align: left; display: inline}
-            select{display: inline; margin-top: -.5em}
+            .inline{text-align: left; display: inline; float: left; margin: auto; margin-left: 5em}
+            select{display: inline; float: left; margin: auto; margin-left: .5em}
             #bottom{position: absolute; bottom: 0px}
+            div{width: 42%; margin: auto; margin-top: 2em}
 		</style>
 	</head>
 	<body>
@@ -37,8 +36,6 @@
                 <option value="syntonolydian">Syntonolydian</option>
                 <option value="exptriad2">Triad</option>
             </select>
-        </div>
-        <div class="lessMargin">
             <p class="inline">Base frequency:</p>
             <select id="frequencySelect">
                 <option value="110" selected>110</option>
@@ -48,8 +45,6 @@
                 <option value="333">333</option>
                 <option value="440">440</option>
             </select>
-        </div>
-        <div class="lessMargin">
             <p class="inline">Beat length:</p>
             <select id="beatLengthSelect">
                 <option value=".1">1/10</option>
