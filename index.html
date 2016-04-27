@@ -1,0 +1,380 @@
+<html>
+	<head>
+		<style>
+			body{margin:0; padding:0}
+            div{margin-left: 2em; margin-top: .5em; padding-top: .5em}
+            .lessMargin{margin-top: -.5em}
+            p{font-family: Helvetica}
+            select{margin-top: -1em}
+            
+            bottom{position: relative; margin-bottom: 0}
+		</style>
+	</head>
+	<body>
+		<canvas id="top"></canvas>
+        <canvas id="bottom"></canvas>
+        <div>
+            <p>Scale:</p>
+            <select id="scaleSelect">
+                <option value="astro">Astro</option>
+                <option value="cluster6a">Cluster</option>
+                <option value="efg333">Genus</option>
+                <option value="gradus5">Gradus</option>
+                <option value="chin_lusheng" selected>Lusheng</option>
+                <option value="polansky_ps">Polansky</option>
+                <option value="robot_live">Robot</option>
+                <option value="slendro_pb">Slendro</option>
+                <option value="syntonolydian">Syntonolydian</option>
+                <option value="exptriad2">Triad</option>
+            </select>
+        </div>
+        <div class="lessMargin">
+            <p>Base frequency:</p>
+            <select id="frequencySelect">
+                <option value="110" selected>110</option>
+                <option value="150">150</option>
+                <option value="220">220</option>
+                <option value="296">296</option>
+                <option value="333">333</option>
+                <option value="440">440</option>
+            </select>
+        </div>
+        <div class="lessMargin">
+            <p>Beat length:</p>
+            <select id="beatLengthSelect">
+                <option value=".1">1/10</option>
+                <option value=".25" selected>1/4</option>
+                <option value=".5">1/2</option>
+                <option value="1">1</option>
+                <option value="3">3</option>
+            </select>
+        </div>
+	</body>
+    <script src="tune.js"></script>
+    <script src="tuna/tuna.js"></script>
+	<script>
+		!(function(){
+			var topCanvas = document.getElementById("top")
+            topCanvas.width = window.innerWidth
+            
+            var sideLength = topCanvas.width / 16
+            
+            topCanvas.height = sideLength * 1.5
+			var topCtx = topCanvas.getContext("2d")
+            topCtx.fillStyle = "#000000"
+            
+            var bottomCanvas = document.getElementById("bottom")
+            bottomCanvas.width = window.innerWidth
+            bottomCanvas.height = sideLength * 1.25
+            var bottomCtx = bottomCanvas.getContext("2d")
+            bottomCtx.fillStyle = "#000000"
+            
+            //topCanvas.height -= 200
+            
+            var xCells = Math.floor(topCanvas.width / sideLength)
+            var updateCount = 0
+            
+            var chordNotes = []
+            var chordBeats = []
+            var beatLength = .25
+            var beatLengthSelect = document.getElementById("beatLengthSelect")
+            
+			var cell = {
+				x: 0,
+				alive: false,
+				nextState: "undefined"
+			}
+			
+			var cells = []
+            var cells2 = []
+            
+            var selectedCell = 0
+            
+            var tune
+            var tuna
+            var convolver
+            var audioCtx
+            var scale = "chin_lusheng"
+            var scaleSelect = document.getElementById("scaleSelect")
+            var baseNote = 110
+            var frequencySelect = document.getElementById("frequencySelect")
+			
+			function init(){
+                for(var i = 0; i < xCells; i++){
+                    var c = Object.create(cell)
+                    var c2 = Object.create(cell)
+                    c.x = i
+                    c2.x = i
+                    
+                    if(Math.random() > .5){
+                        c.alive = true
+                    }
+                    
+                    if(Math.random() > .5){
+                        c2.alive = true
+                    }
+                    
+                    cells[i] = c
+                    cells2[i] = c2
+                    
+                    if(i == 0){
+                        if(c2.alive){
+                            chordBeats.push(i)
+                        }
+                    }
+                    else{
+                        if(c2.alive && !cells2[i - 1].alive){
+                            chordBeats.push(i)
+                        }
+                    }
+                }
+                
+                /*ctx.font = "36px Helvetica"
+                ctx.fillText("Dischord", canvas.width / 2 - 450, canvas.height / 2 - 100)
+                ctx.font = "16px Helvetica"
+                ctx.fillText("The goal of Dischord is to generate near-completely random sequences of chords.", canvas.width / 2 - 450, canvas.height / 2 - 75)
+                ctx.fillText("This is accomplished using two one-dimensional cellular automata.", canvas.width / 2 - 450, canvas.height / 2 - 55)
+                ctx.fillText("The bottom automaton determines the timing and length of each chord.", canvas.width / 2 - 450, canvas.height / 2 - 35)
+                ctx.fillText("The top automaton determines the frequencies of the notes that will be played in the chord, based on the provided scale.", canvas.width / 2 - 450, canvas.height / 2 - 15)
+                ctx.fillText("Both automata generate patterns that cannot be reproduced without the seed and rules, except by NP processes.", canvas.width / 2 - 450, canvas.height / 2 + 5)
+                ctx.fillText("Read more about the randomness at", canvas.width / 2 - 450, canvas.height / 2 + 25)
+                ctx.fillText("http://www.stephenwolfram.com/publications/cellular-automata-complexity/pdfs/random-sequence-generation-cellular-automata.pdf.", canvas.width / 2 - 450, canvas.height / 2 + 45)
+                ctx.fillText("Created by Reuben Brenner-Adams using Tune.js (https://github.com/abbernie/tune)", canvas.width / 2 - 450, canvas.height / 2 + 65)
+                ctx.fillText("and Tuna.js (https://github.com/Theodeus/tuna)", canvas.width / 2 - 450, canvas.height / 2 + 85)
+                ctx.fillText("Copyright 2016.", canvas.width / 2 - 450, canvas.height / 2 + 105)*/
+                
+                initTune()
+            }
+            
+            function initTune(){
+                tune = new Tune()
+                tune.loadScale(scale)
+                tune.tonicize(baseNote)
+                
+                audioCtx = new AudioContext()
+                
+                tuna = new Tuna(audioCtx)
+                convolver = new tuna.Convolver({
+                    highCut: 22050,
+                    lowCut: 20,
+                    dryLevel: 1,
+                    wetLevel: 1.5,
+                    level: 1,
+                    impulse: "tuna/impulses/impulse_rev.wav",
+                    bypass: 0
+                })
+            }
+			
+			function update(chordLength){
+                chordNotes = []
+                for(var i = 0; i < xCells; i++){
+                    if(i == 0){
+                        if(cells[xCells - 1].alive != (cells[i].alive || cells[i + 1].alive)){
+                            cells[i].nextState = "living"
+                        }
+                        else{
+                            cells[i].nextState = "dead"
+                        }
+                    }
+                    else if(i == xCells - 1){
+                        if((cells[i - 1].alive != (cells[i].alive || cells[0].alive))){
+                            cells[i].nextState = "living"
+                        }
+                        else{
+                            cells[i].nextState = "dead"
+                        }
+                    }
+                    else{
+                        if(cells[i - 1].alive != (cells[i].alive || cells[i + 1].alive)){
+                            cells[i].nextState = "living"
+                        }
+                        else{
+                            cells[i].nextState = "dead"
+                        }
+                    }
+				}
+				
+				for(var i = 0; i < xCells; i++){
+                    if(cells[i].nextState == "living"){
+                        cells[i].alive = true
+                        chordNotes.push(i)
+                    }
+                    else{
+                        cells[i].alive = false
+                    }
+                    
+                    cells[i].nextState = "undefined"
+				}
+                
+                for(var i = 0; i < chordNotes.length; i++){
+                    playNote(chordNotes[i], chordLength * beatLength, .05, .25 * beatLength, .25 * beatLength, 0)
+                }
+				
+				draw()
+			}
+            
+            function update2(){
+                chordBeats = []
+                
+                for(var i = 0; i < xCells; i++){
+                    if(i == 0){
+                        if(cells2[xCells - 1].alive != (cells2[i].alive || cells2[i + 1].alive)){
+                            cells2[i].nextState = "living"
+                        }
+                        else{
+                            cells2[i].nextState = "dead"
+                        }
+                    }
+                    else if(i == xCells - 1){
+                        if((cells2[i - 1].alive != (cells2[i].alive || cells2[0].alive))){
+                            cells2[i].nextState = "living"
+                        }
+                        else{
+                            cells2[i].nextState = "dead"
+                        }
+                    }
+                    else{
+                        if(cells2[i - 1].alive != (cells2[i].alive || cells2[i + 1].alive)){
+                            cells2[i].nextState = "living"
+                        }
+                        else{
+                            cells2[i].nextState = "dead"
+                        }
+                    }
+				}				
+				for(var i = 0; i < xCells; i++){
+                    if(cells2[i].nextState == "living"){
+                        cells2[i].alive = true
+                    }
+                    else{
+                        cells2[i].alive = false
+                    }
+                    
+                    cells2[i].nextState = "undefined"
+				}
+                
+                for(var i = 0; i < xCells; i++){
+                    if(i == 0){
+                        if(cells2[i].alive){
+                            chordBeats.push(i)
+                        }
+                    }
+                    else{
+                        if(cells2[i].alive && !cells2[i - 1].alive){
+                            chordBeats.push(i)
+                        }
+                    }
+                }
+			}
+			
+			function draw(){
+				topCtx.clearRect(0, 0, topCanvas.width, topCanvas.height)
+                
+                for(var i = 0; i < xCells; i++){
+                    if(cells[i].alive){
+                        topCtx.fillRect(i * sideLength, 0, sideLength, sideLength)
+                    }
+                }
+                
+                updateCount++
+                
+                for(var i = 0; i < xCells; i++){
+                    topCtx.font = "18px Helvetica"
+                    topCtx.fillText(parseInt(tune.note(i)), i * sideLength + 10, sideLength + 20)
+                }
+			}
+            
+            function draw2(){
+				bottomCtx.clearRect(0, 0, bottomCanvas.width, bottomCanvas.height)
+                
+                for(var i = 0; i < xCells; i++){
+                    if(cells2[i].alive){
+                        bottomCtx.fillRect(i * sideLength, bottomCanvas.height - sideLength - 2, sideLength, sideLength)
+                    }
+                }
+                
+                //Do in two separate loops so the outline will draw on top
+                for(var i = 0; i < xCells; i++){
+                    if(i == selectedCell){
+                        bottomCtx.lineWidth = 2
+                        bottomCtx.strokeStyle = "#ff0000"
+                        bottomCtx.strokeRect(i * sideLength, bottomCanvas.height - sideLength - 2, sideLength, sideLength)
+                    }
+                }
+                
+                if(chordBeats.includes(selectedCell)){
+                    update(findChordLength(selectedCell))
+                }
+                
+                selectedCell++
+                if(selectedCell >= xCells){
+                    update2()
+                    selectedCell = 0
+                }
+			}
+            
+            function findChordLength(index){
+                var length = 1
+                var finished = false
+                
+                while(!finished){
+                    if(index + length < cells2.length){
+                        if(cells2[index + length].alive){
+                            length++
+                        }
+                        else{
+                            finished = true
+                        }
+                    }
+                    else{
+                        finished = true
+                    }
+                }
+                
+                return length
+            }
+            
+			function playNote(frequency, duration, amp, attack, decay, detune){
+                osc = audioCtx.createOscillator()
+				osc.type = "triangle"
+				osc.frequency.value = tune.note(frequency)
+				
+				// create gain node to control amplitude
+				gainNode = audioCtx.createGain()
+				gainNode.gain.setValueAtTime(0, audioCtx.currentTime)
+				gainNode.gain.linearRampToValueAtTime(amp, audioCtx.currentTime + attack)
+                gainNode.gain.linearRampToValueAtTime(amp, audioCtx.currentTime + duration - (attack + decay))
+				gainNode.gain.linearRampToValueAtTime(0,   audioCtx.currentTime + duration)
+				
+				osc.connect(gainNode)
+				//gainNode.connect(audioCtx.destination)
+                
+                gainNode.connect(convolver)
+                convolver.connect(audioCtx.destination)
+				
+				osc.start()
+				osc.stop(audioCtx.currentTime + duration)
+			}
+            
+            function changeScale(e){
+                tune.loadScale(scaleSelect.value)
+            }
+            
+            function changeBaseFrequency(e){
+                tune.tonicize(parseInt(frequencySelect.value))
+            }
+            
+            function changeBeatLength(e){
+                beatLength = parseFloat(beatLengthSelect.value)
+                clearInterval(interval)
+                interval = setInterval(draw2, beatLength * 1000)
+            }
+            
+            window.onload = init
+            var interval = setInterval(draw2, beatLength * 1000)
+            scaleSelect.onchange = changeScale
+            frequencySelect.onchange = changeBaseFrequency
+            beatLengthSelect.onchange = changeBeatLength
+		})()
+	</script>
+</html>
