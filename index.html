@@ -3,11 +3,11 @@
 		<style>
             body{font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif}
             h1{text-align: center}
-            p{text-align: center}
+            p{text-align: center; margin-top: -.5em}
             .inline{text-align: left; display: inline; float: left; margin: auto; margin-left: 5em}
             select{display: inline; float: left; margin: auto; margin-left: .5em}
             #bottom{position: absolute; bottom: 0px}
-            div{width: 42%; margin: auto; margin-top: 2em}
+            div{width: 66%; margin: auto; margin-top: 2em}
 		</style>
 	</head>
 	<body>
@@ -53,6 +53,22 @@
                 <option value="1">1</option>
                 <option value="3">3</option>
             </select>
+            <p class="inline">Attack length:</p>
+            <select id="attackLengthSelect">
+                <option value=".05" selected>1/20</option>
+                <option value=".1">1/10</option>
+                <option value=".2">1/5</option>
+                <option value=".5">1/2</option>
+                <option value="1">1</option>
+            </select>
+            <p class="inline">Decay length:</p>
+            <select id="decayLengthSelect">
+                <option value=".05" selected>1/20</option>
+                <option value=".1">1/10</option>
+                <option value=".2">1/5</option>
+                <option value=".5">1/2</option>
+                <option value="1">1</option>
+            </select>
         </div>
 	</body>
     <script src="tune.js"></script>
@@ -74,14 +90,14 @@
             var bottomCtx = bottomCanvas.getContext("2d")
             bottomCtx.fillStyle = "#000000"
             
-            //topCanvas.height -= 200
-            
             var xCells = Math.floor(topCanvas.width / sideLength)
             var updateCount = 0
             
             var chordNotes = []
             var chordBeats = []
             var beatLength = .25
+            var attackLength = .05
+            var decayLength = .05
             var beatLengthSelect = document.getElementById("beatLengthSelect")
             
 			var cell = {
@@ -212,7 +228,7 @@
 				}
                 
                 for(var i = 0; i < chordNotes.length; i++){
-                    playNote(chordNotes[i], chordLength * beatLength, .05, .25 * beatLength, .25 * beatLength, 0)
+                    playNote(chordNotes[i], chordLength * beatLength, .05, attackLength, decayLength, 0)
                 }
 				
 				draw()
@@ -343,12 +359,19 @@
                 osc = audioCtx.createOscillator()
 				osc.type = "triangle"
 				osc.frequency.value = tune.note(frequency)
+                
+                if(attack + decay > duration){
+                    attack = (attack / decay) * (decay * (duration / 2))
+                    decay = duration - attack
+                }
+                
+                console.log(attack, decay)
 				
 				// create gain node to control amplitude
 				gainNode = audioCtx.createGain()
 				gainNode.gain.setValueAtTime(0, audioCtx.currentTime)
 				gainNode.gain.linearRampToValueAtTime(amp, audioCtx.currentTime + attack)
-                gainNode.gain.linearRampToValueAtTime(amp, audioCtx.currentTime + duration - (attack + decay))
+                gainNode.gain.linearRampToValueAtTime(amp, audioCtx.currentTime + duration - decay)
 				gainNode.gain.linearRampToValueAtTime(0,   audioCtx.currentTime + duration)
 				
 				osc.connect(gainNode)
@@ -375,11 +398,21 @@
                 interval = setInterval(draw2, beatLength * 1000)
             }
             
+            function changeAttackLength(e){
+                attackLength = parseFloat(attackLengthSelect.value)
+            }
+            
+            function changeDecayLength(e){
+                decayLength = parseFloat(decayLengthSelect.value)
+            }
+            
             window.onload = init
             var interval = setInterval(draw2, beatLength * 1000)
             scaleSelect.onchange = changeScale
             frequencySelect.onchange = changeBaseFrequency
             beatLengthSelect.onchange = changeBeatLength
+            attackLengthSelect.onchange = changeAttackLength
+            decayLengthSelect.onchange = changeDecayLength
 		})()
 	</script>
 </html>
