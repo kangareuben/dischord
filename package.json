@@ -1,0 +1,24 @@
+{
+  "name": "dischord",
+  "version": "1.0.0",
+  "description": "random chord generation using NP cellular automata sequences",
+  "main": "gulpfile.js",
+  "dependencies": {
+    "babel-preset-es2015": "^6.6.0",
+    "babylonjs": "^2.3.0",
+    "browserify": "^13.0.0",
+    "gulp": "^3.9.1",
+    "gulp-babel": "^6.1.2",
+    "gulp-notify": "^2.2.0",
+    "gulp-rename": "^1.2.2",
+    "gulp-uglify": "^1.5.3",
+    "three": "^0.75.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Charlie Roberts <charlie@charlie-roberts.com> (http://www.charlie-roberts.com/)",
+  "author": "Reuben Brenner-Adams <rmb1952@rit.edu> (http://www.reubenbrenneradams.com/)",
+  "license": "MIT"
+}
