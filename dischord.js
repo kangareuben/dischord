@@ -1,3 +1,5 @@
+//Drawing variable declaration
+//----------------------------
 let topCanvas = document.getElementById("top")
 topCanvas.width = window.innerWidth
 
@@ -19,7 +21,6 @@ let backgroundCanvas = document.getElementById("background")
 backgroundCanvas.width = window.innerWidth
 backgroundCanvas.height = window.innerHeight
 let backgroundCtx = backgroundCanvas.getContext("2d")
-//let gl = backgroundCanvas.getContext("webgl")
 backgroundCtx.fillStyle = "#ccccff"
 
 let backgroundColors = [[176, 23, 31], [205, 16, 118], [148, 0, 211], [0, 0, 139], [0, 128, 128], [46, 139, 87], [0, 100, 0], [85, 107, 47], [238, 118, 0], [255, 69, 0]]
@@ -33,15 +34,15 @@ let nextForegroundColor = [255, 255, 255]
 
 let reachedNextColor = true
 
+let fadeDiv = document.getElementById("fadeable")
+let fadeOpacity = 1
+let mouseLastMoved
+//----------------------------
+
+//Automata variable declaration
+//----------------------------
 let xCells = Math.floor(topCanvas.width / sideLength)
 let updateCount = 0
-
-let chordNotes = []
-let chordBeats = []
-let beatLength = .25
-let attackLength = .05
-let decayLength = .05
-let beatLengthSelect = document.getElementById("beatLengthSelect")
 
 let cell = {
     x: 0,
@@ -53,6 +54,16 @@ let cells = []
 let cells2 = []
 
 let selectedCell = 0
+//----------------------------
+
+//Audio variable declaration
+//----------------------------
+let chordNotes = []
+let chordBeats = []
+let beatLength = .25
+let attackLength = .05
+let decayLength = .05
+let beatLengthSelect = document.getElementById("beatLengthSelect")
 
 let tune
 let tuna
@@ -62,11 +73,10 @@ let scale = "chin_lusheng"
 let scaleSelect = document.getElementById("scaleSelect")
 let baseNote = 110
 let frequencySelect = document.getElementById("frequencySelect")
+//----------------------------
 
-let fadeDiv = document.getElementById("fadeable")
-let fadeOpacity = 1
-let mouseLastMoved
-
+//Initialization functions
+//----------------------------
 let init = () => {
     for(let i = 0; i < xCells; i++){
         let c = Object.create(cell)
@@ -120,7 +130,10 @@ let initTune = () => {
         bypass: 0
     })
 }
+//----------------------------
 
+//Update top automaton
+//----------------------------
 let update = chordLength => {
     chordNotes = []
     for(let i = 0; i < xCells; i++){
@@ -185,7 +198,10 @@ let update = chordLength => {
     
     draw()
 }
+//----------------------------
 
+//Update bottom automaton
+//----------------------------
 let update2 = () => {
     chordBeats = []
     
@@ -239,7 +255,10 @@ let update2 = () => {
         }
     }
 }
+//----------------------------
 
+//Draw top automaton
+//----------------------------
 let draw = () => {
     topCtx.clearRect(0, 0, topCanvas.width, topCanvas.height)
     
@@ -260,7 +279,10 @@ let draw = () => {
     
     shaders()
 }
+//----------------------------
 
+//Draw bottom automaton
+//----------------------------
 let draw2 = () => {
     bottomCtx.clearRect(0, 0, bottomCanvas.width, bottomCanvas.height)
     
@@ -289,7 +311,10 @@ let draw2 = () => {
         selectedCell = 0
     }
 }
+//----------------------------
 
+//Draw background canvas
+//----------------------------
 let shaders = () => {
     if(reachedNextColor){
         let i = getRandomBackgroundColor()
@@ -328,7 +353,10 @@ let shaders = () => {
         }
     }
 }
+//----------------------------
 
+//Helper functions for background canvas
+//----------------------------
 let componentToHex = c => {
     let hex = c.toString(16);
     return hex.length == 1 ? "0" + hex : hex;
@@ -362,20 +390,10 @@ let lerpTowardColor = (currentColor, newColor) => {
 let rgbToHex = (r, g, b) => {
     return "#" + componentToHex(r) + componentToHex(g) + componentToHex(b);
 }
+//----------------------------
 
-let fadeCanvas = () => {
-    /*var pixels = backgroundCtx.getImageData(0, 0, window.innerWidth, window.innerHeight);
-    
-    for(var d = 3; d < pixels.data.length; d += 4){
-        pixels.data[d] = Math.floor(pixels.data[d] * .999)
-        if(pixels.data[d] < 0){
-            pixels.data[d] = 0
-        }
-    }
-    
-    backgroundCtx.putImageData(pixels, 0, 0)*/
-}
-
+//Fade out the description and controls when the mouse isn't moving
+//----------------------------
 let fadeText = () => {
     fadeDiv.style.opacity = fadeOpacity;
     fadeDiv.style.filter = 'alpha(opacity=' + fadeOpacity * 100 + ")";
@@ -388,7 +406,10 @@ let fadeText = () => {
         fadeOpacity = 0
     }
 }
+//----------------------------
 
+//Audio helper functions
+//----------------------------
 let findChordLength = index => {
     let length = 1
     let finished = false
@@ -435,12 +456,14 @@ let playNote = (frequency, duration, amp, attack, decay, detune) => {
     osc.start()
     osc.stop(audioCtx.currentTime + duration)
 }
+//----------------------------
 
+//Event callbacks
+//----------------------------
 window.onload = init
 let interval = setInterval(draw2, beatLength * 1000)
 let interval2 = setInterval(shaders, Math.random() * beatLength * 3000)
-let interval3 = setInterval(fadeCanvas, (1000. / 180.) / (beatLength / 5.))
-let interval4 = setInterval(fadeText, 100)
+let interval3 = setInterval(fadeText, 100)
 
 document.onmousemove = () => {
     fadeOpacity = 1
@@ -459,10 +482,8 @@ beatLengthSelect.onchange = () => {
     beatLength = parseFloat(beatLengthSelect.value)
     clearInterval(interval)
     clearInterval(interval2)
-    clearInterval(interval3)
     interval = setInterval(draw2, beatLength * 1000)
     interval2 = setInterval(shaders, Math.random() * beatLength * 1500)
-    interval3 = setInterval(fadeCanvas, beatLength * (1000. / 180.))
 }
 
 attackLengthSelect.onchange = () => {
@@ -472,3 +493,4 @@ attackLengthSelect.onchange = () => {
 decayLengthSelect.onchange = () => {
     decayLength = parseFloat(decayLengthSelect.value)
 }
+//----------------------------
