@@ -6,64 +6,71 @@
         <link rel="stylesheet" type="text/css" href="style.css">
 	</head>
 	<body>
-		<canvas id="top"></canvas>
+		<canvas id="background"></canvas>
+        <canvas id="top"></canvas>
         <canvas id="bottom"></canvas>
-        <h1>Dischord</h1>
-        <p>The goal of Dischord is to generate near-completely random sequences of chords.</p>
-        <p>This is accomplished using two one-dimensional cellular automata.</p>
-        <p>The bottom automaton determines the timing and length of each chord.</p>
-        <p>The top automaton determines the frequencies of the notes that will be played in the chord, based on the provided scale.</p>
-        <p>Both automata generate patterns that cannot be reproduced without the seed and rules, except by NP processes.</p>
-        <p>Read more about the randomness at <a target="_blank" href="http://www.stephenwolfram.com/publications/cellular-automata-complexity/pdfs/random-sequence-generation-cellular-automata.pdf">http://www.stephenwolfram.com/publications/cellular-automata-complexity/pdfs/random-sequence-generation-cellular-automata.pdf</a>.</p>
-        <p>Created by <a href="http://reubenbrenneradams.com">Reuben Brenner-Adams</a> using <a target="_blank" href="https://github.com/abbernie/tune">Tune.js</a> and <a target="_blank" href="https://github.com/Theodeus/tuna">Tuna.js</a>.</p>
-        <p>Copyright 2016.</p>
-        <div>
-            <p class="inline">Scale:</p>
-            <select id="scaleSelect">
-                <option value="astro">Astro</option>
-                <option value="cluster6a">Cluster</option>
-                <option value="efg333">Genus</option>
-                <option value="gradus5">Gradus</option>
-                <option value="chin_lusheng" selected>Lusheng</option>
-                <option value="polansky_ps">Polansky</option>
-                <option value="robot_live">Robot</option>
-                <option value="slendro_pb">Slendro</option>
-                <option value="syntonolydian">Syntonolydian</option>
-                <option value="exptriad2">Triad</option>
-            </select>
-            <p class="inline">Base frequency:</p>
-            <select id="frequencySelect">
-                <option value="110" selected>110</option>
-                <option value="150">150</option>
-                <option value="220">220</option>
-                <option value="296">296</option>
-                <option value="333">333</option>
-                <option value="440">440</option>
-            </select>
-            <p class="inline">Beat length:</p>
-            <select id="beatLengthSelect">
-                <option value=".1">1/10</option>
-                <option value=".25" selected>1/4</option>
-                <option value=".5">1/2</option>
-                <option value="1">1</option>
-                <option value="3">3</option>
-            </select>
-            <p class="inline">Attack length:</p>
-            <select id="attackLengthSelect">
-                <option value=".05" selected>1/20</option>
-                <option value=".1">1/10</option>
-                <option value=".2">1/5</option>
-                <option value=".5">1/2</option>
-                <option value="1">1</option>
-            </select>
-            <p class="inline">Decay length:</p>
-            <select id="decayLengthSelect">
-                <option value=".05" selected>1/20</option>
-                <option value=".1">1/10</option>
-                <option value=".2">1/5</option>
-                <option value=".5">1/2</option>
-                <option value="1">1</option>
-            </select>
+        <div id="fadeable">
+            <h1>Dischord</h1>
+            <p>The goal of Dischord is to generate near-completely random sequences of chords.</p>
+            <p>This is accomplished using two one-dimensional cellular automata.</p>
+            <p>The bottom automaton determines the timing and length of each chord.</p>
+            <p>The top automaton determines the frequencies of the notes that will be played in the chord, based on the provided scale.</p>
+            <p>Both automata generate patterns that cannot be reproduced without the seed and rules, except by NP processes.</p>
+            <p>Read more about the randomness at <a target="_blank" href="http://www.stephenwolfram.com/publications/cellular-automata-complexity/pdfs/random-sequence-generation-cellular-automata.pdf">http://www.stephenwolfram.com/publications/cellular-automata-complexity/pdfs/random-sequence-generation-cellular-automata.pdf</a>.</p>
+            <p>Created by <a href="http://reubenbrenneradams.com">Reuben Brenner-Adams</a> using <a target="_blank" href="https://github.com/abbernie/tune">Tune.js</a> and <a target="_blank" href="https://github.com/Theodeus/tuna">Tuna.js</a>.</p>
+            <p>Copyright 2016.</p>
+            <div>
+                <p class="inline">Scale:</p>
+                <select id="scaleSelect">
+                    <option value="astro">Astro</option>
+                    <option value="cluster6a">Cluster</option>
+                    <option value="efg333">Genus</option>
+                    <option value="gradus5">Gradus</option>
+                    <option value="chin_lusheng" selected>Lusheng</option>
+                    <option value="polansky_ps">Polansky</option>
+                    <option value="robot_live">Robot</option>
+                    <option value="slendro_pb">Slendro</option>
+                    <option value="syntonolydian">Syntonolydian</option>
+                    <option value="exptriad2">Triad</option>
+                </select>
+                <p class="inline">Base frequency:</p>
+                <select id="frequencySelect">
+                    <option value="110" selected>110</option>
+                    <option value="150">150</option>
+                    <option value="220">220</option>
+                    <option value="296">296</option>
+                    <option value="333">333</option>
+                    <option value="440">440</option>
+                </select>
+                <p class="inline">Beat length:</p>
+                <select id="beatLengthSelect">
+                    <option value=".1">1/10</option>
+                    <option value=".25" selected>1/4</option>
+                    <option value=".5">1/2</option>
+                    <option value="1">1</option>
+                    <option value="3">3</option>
+                </select>
+                <p class="inline">Attack length:</p>
+                <select id="attackLengthSelect">
+                    <option value=".001">1/1000</option>
+                    <option value=".01">1/100</option>
+                    <option value=".05" selected>1/20</option>
+                    <option value=".1">1/10</option>
+                    <option value=".2">1/5</option>
+                    <option value=".5">1/2</option>
+                    <option value="1">1</option>
+                </select>
+                <p class="inline">Decay length:</p>
+                <select id="decayLengthSelect">
+                    <option value=".001">1/1000</option>
+                    <option value=".01">1/100</option>
+                    <option value=".05" selected>1/20</option>
+                    <option value=".1">1/10</option>
+                    <option value=".2">1/5</option>
+                    <option value=".5">1/2</option>
+                    <option value="1">1</option>
+                </select>
+            </div>
         </div>
 	</body>
     <script src="tune.js"></script>

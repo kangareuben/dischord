@@ -1,5 +1,12 @@
 body{
     font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
+    color: white;
+    margin: 0;
+    padding: 0;
+}
+
+a{
+    color: white;
 }
 
 h1{
@@ -27,13 +34,31 @@ select{
     margin-left: .5em;
 }
 
+#top{
+    margin: 0;
+    padding: 0;
+}
+
 #bottom{
     position: absolute;
-    bottom: 0px;
+    bottom: 0;
+    left: 0;
 }
 
 div{
     width: 66%;
     margin: auto;
     margin-top: 2em;
+}
+
+#fadeable{
+    width: 100%;
+    margin-top: -2em;
+}
+
+#background{
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: -1;
 }
